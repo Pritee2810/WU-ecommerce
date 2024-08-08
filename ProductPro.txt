@@ -1,0 +1,277 @@
+Main.java:
+-------------
+public static int test() {
+		// TODO Auto-generated method stub
+		ProductService productService=ProductServiceImpl.getInstance();
+		
+		/*Product products[] =new Product[10];
+		System.out.println(products.length);
+		
+		for (Product product : products) {
+			System.out.println(product);
+		}*/
+		for(int i=0; i<11; i++) {
+			System.out.println(productService.addProduct(new Product("1", "abc", i, "xyz")));
+			//sSystem.out.println(productService.addProduct(null));
+		}
+		
+System.out.println("----------");
+			System.out.println(productService.getEmployeeByProductId("1"));
+			//sSystem.out.println(productService.addProduct(null));
+			
+			System.out.println("----------");		
+			Optional optionalResult = productService.getProducts();
+			if(optionalResult.isPresent()) {
+				//get method
+				for(int i=0; i<11; i++) {
+					System.out.println(productService.getProducts());
+					//sSystem.out.println(productService.addProduct(null));
+				}
+			}
+			
+			
+			
+			System.out.println("------------------");
+			int b[]=new int[10];
+			int a=0;
+			try {
+				a=10/5;  //predifined in lang. jvm createds object. jvm deals with exception and terminates the prog.
+				b[11]=0;
+				System.out.println("inside try");
+				return a;
+			}
+			catch(ArrayIndexOutOfBoundsException e) {
+				System.out.println(e.getMessage());
+			}
+			catch(ArithmeticException e) {
+				a=10/0;
+				System.out.println("inside catch");
+				return a;
+			}
+			catch(RuntimeException e) {
+				
+			}
+			catch(Exception e) {
+				
+			}
+			catch(Throwable e) {
+				
+			}
+			//catch(Object o) {						//not allowed. if its allow, it will handle all exception of classes and Throwable class will loose his properties
+			//}
+			finally {
+				System.out.println("hello");
+			}
+			return a;
+			
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=======================================================================
+http://127.0.0.1:8080/htmldb   =>Oracle DB
+jdbc.url=jdbc:oracle:thin:@//localhost:1521/XE
+jdbc.username=System
+jdbc.passowrd=System
+
+http://www.java2s.com/Code/Jar/o/Downloadojdbc14jar.htm#google_vignette =>ojdbc jar
+=====================================================================
+create table Product(productId varchar2(10) primary key, productName varchar2(20), price number(8,8), categoryName varchar2(10));
+SELECT * FROM user_tables;
+Select * from Product;
+desc Product;
+SELECT * FROM V$VERSION;
+==========================================================================
+
+mvn install:install-file ^
+  -Dfile=C:/Users/Student/Downloads/ojdbc14.jar ^
+  -DgroupId=com.oracle ^
+  -DartifactId=ojdbc14 ^
+  -Dversion=10.2.0.4 ^
+  -Dpackaging=jar
+
+
+
+
+<dependencies>
+    <dependency>
+        <groupId>com.example</groupId>
+        <artifactId>local-jar</artifactId>
+        <version>1.0.0</version>							//given by sir
+        <scope>system</scope>
+        <systemPath>${project.basedir}/libs/local-jar-1.0.0.jar</systemPath>			
+    </dependency>
+</dependencies>
+
+
+<!-- https://mvnrepository.com/artifact/com.oracle/ojdbc14 -->
+  	<dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc14</artifactId>						//my
+        <version>10.2.0.4</version>
+    </dependency>
+
+
+
+mvn install:install-file ^
+    -Dfile=C:\path\to\ojdbc14.jar ^
+    -DgroupId=com.oracle ^
+    -DartifactId=ojdbc14 ^
+    -Dversion=10.2.0.4.0 ^
+    -Dpackaging=jar
+
+=======================================================================
+**The general contract of hashCode is:
+
+Whenever it is invoked on the same object more than once during an execution of a Java application, the hashCode method must consistently return the same integer, provided no information used in equals comparisons on the object is modified. This integer need not remain consistent from one execution of an application to another execution of the same application.
+If two objects are equal according to the equals(Object) method, then calling the hashCode method on each of the two objects must produce the same integer result.
+It is not required that if two objects are unequal according to the equals(java.lang.Object) method, then calling the hashCode method on each of the two objects must produce distinct integer results. However, the programmer should be aware that producing distinct integer results for unequal objects may improve the performance of hash tables.
+
+
+
+
+
+
+
+
+//productrepository impl
+---------------------------------
+package com.wu.ecommerce.repo;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import com.wu.ecommerce.dto.Product;
+
+public class ProductRepositoryImpl implements ProductRepository {
+private ProductRepositoryImpl() {
+	// TODO Auto-generated constructor stub
+}
+private Product[] products=new Product[10];
+private static ProductRepository productRepository;
+private static int counter=-1;
+
+public static ProductRepository getInstance() {
+	if(productRepository ==null) {
+		//create the object
+		productRepository = new ProductRepositoryImpl();
+		
+	}
+	return productRepository;
+}
+
+	@Override
+	public Product addProduct(Product product) {
+		// TODO Auto-generated method stub
+		if(counter>=products.length-1) {
+			//increase in size of the array
+			Product temp[]=new Product[products.length*2];
+			//
+			//Arrays.copyOf(null, counter);
+			System.arraycopy(products, 0, temp, 0, products.length);
+			products=temp;
+			products[++counter]=product;
+			//return product;
+		}
+		else {
+			//retular addition 
+			products[++counter]=product;
+			
+		}
+		return product;
+	}
+
+	public Optional<Product> getEmployeeByProductId(String id) {
+		//Product finalProduct=null;
+		for (Product product : products) {
+			if(product.getProductId().equals(id) && product!=null) {
+				return Optional.of(product);
+//				finalProduct=product;
+			}
+		}
+		// TODO Auto-generated method stub
+//		return Optional.ofNullable(finalProduct);
+		return Optional.empty();
+	}
+
+	public Optional<Product[]> getProducts() {
+		// TODO Auto-generated method stub
+		/*if(products!=null || products.length>0) {
+			return Optional.of(products);
+		}*/
+//		return Optional.empty();
+		return Optional.ofNullable(products);
+	}
+
+	public Optional<Product[]> getAllProductsByCategory(String cat) {
+		// TODO Auto-generated method stub
+		for (Product product : products) {
+			if(product.getCategoryName().equals(cat) && product!=null) {
+				Product temp[]=new Product[products.length];
+				
+				return Optional.of(temp);
+//				finalProduct=product;
+			}
+		}
+		
+		return Optional.empty();
+	}
+
+	public String removeProductByProductId(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Product updateProductByProductId(String id, Product product) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
+
+
+
+
+
+=============================
+String query = "SELECT * FROM Product WHERE productId=?";
+		Connection connection = DBUtils.getInstance().getConnection();
+		PreparedStatement preparedStatement = connection.prepareStatement(query);
+		preparedStatement.setString(1, id);
+		ResultSet resultSet = preparedStatement.executeQuery();
+		List<Product> p1 = new ArrayList<Product>();
+		while (resultSet.next()) {
+			Product product = new Product();
+			product.setProductId(resultSet.getString("productId"));
+			product.setProductName(resultSet.getString("productName"));
+			product.setPrice(resultSet.getFloat("price"));
+			product.setCategoryName(resultSet.getString("categoryName"));
+			p1.add(product);
+		}
+		return p1.
+				stream().
+				filter(e->e.getProductId().equals(id)).
+				findFirst().
+				orElseThrow(()-> new IdNotFoundException("Id not found"));
